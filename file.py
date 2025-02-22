@@ -14,7 +14,7 @@ def move_bitmap():
 
 # Cria a janela principal
 root = tk.Tk()
-root.title("Aterrissagem da Nave")
+root.title(" ")
 root.configure(bg="yellow")
 
 # Define as dimensões da janela
