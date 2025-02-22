@@ -1,45 +1,71 @@
+import pygame
+import math
 
-import tkinter as tk
-from PIL import Image, ImageTk
-import time
+# Inicializar o Pygame
+pygame.init()
 
-def move_bitmap():
-    global y_position
+# Configuração da janela
+screen_width = 800
+screen_height = 600
+screen = pygame.display.set_mode((screen_width, screen_height))
+pygame.display.set_caption("Boneco Anatômico 3D Simulado")
 
-    # Atualiza a posição do bitmap
-    if y_position < window_height - bitmap_height:
-        y_position += 5  # Ajusta a velocidade da descida
-        canvas.move(bitmap, 0, 5)
-        root.after(50, move_bitmap)  # Chama a função novamente após 50ms
+# Cores
+YELLOW = (255, 255, 0)
 
-# Cria a janela principal
-root = tk.Tk()
-root.title(" ")
-root.configure(bg="yellow")
+# Carregar a imagem do boneco anatômico
+boneco_image = pygame.image.load("bit.png").convert_alpha()  # Substitua pelo caminho da sua imagem
+boneco_original_width = boneco_image.get_width()
+boneco_original_height = boneco_image.get_height()
 
-# Define as dimensões da janela
-window_width = 400
-window_height = 600
-root.geometry(f"{window_width}x{window_height}")
+# Posição inicial do boneco
+x = 0
+z = 10  # Controle da "profundidade"
+z_min = 5
+z_max = 50
+scale_factor = 10
 
-# Cria o canvas para exibir o bitmap
-canvas = tk.Canvas(root, width=window_width, height=window_height, bg="yellow", highlightthickness=0)
-canvas.pack()
+# Loop principal
+running = True
+clock = pygame.time.Clock()
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
 
-# Carrega a imagem do bitmap
-image = Image.open("bit.png")
-bitmap_image = ImageTk.PhotoImage(image)
-bitmap_width, bitmap_height = image.size
+    # Capturar entrada do teclado
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_LEFT]:
+        x -= 1
+    if keys[pygame.K_RIGHT]:
+        x += 1
+    if keys[pygame.K_UP]:
+        z = max(z_min, z - 1)
+    if keys[pygame.K_DOWN]:
+        z = min(z_max, z + 1)
 
-# Calcula a posição inicial
-x_position = (window_width - bitmap_width) // 2  # Centraliza horizontalmente
-y_position = 0
+    # Calcular parâmetros com base em z
+    scale = 1 / z * scale_factor
+    scaled_width = int(boneco_original_width * scale)
+    scaled_height = int(boneco_original_height * scale)
+    center_x = screen_width // 2 + int(x * scale * 20)
+    center_y = screen_height // 2 + int(z * scale * 10)
 
-# Adiciona o bitmap ao canvas
-bitmap = canvas.create_image(x_position, y_position, anchor=tk.NW, image=bitmap_image)
+    # Redimensionar a imagem do boneco
+    boneco_scaled = pygame.transform.scale(boneco_image, (scaled_width, scaled_height))
 
-# Inicia o movimento do bitmap
-move_bitmap()
+    # Limpar tela
+    screen.fill(YELLOW)
 
-# Executa a aplicação
-root.mainloop()
+    # Desenhar o boneco
+    boneco_rect = boneco_scaled.get_rect(center=(center_x, center_y))
+    screen.blit(boneco_scaled, boneco_rect)
+
+    # Atualizar a tela
+    pygame.display.flip()
+
+    # Controlar a taxa de quadros
+    clock.tick(60)
+
+# Sair do Pygame
+pygame.quit()
