@@ -1,5 +1,6 @@
 import pygame
 import math
+from PIL import Image, ImageTk
 
 # Inicializar o Pygame
 pygame.init()
@@ -8,12 +9,14 @@ pygame.init()
 screen_width = 800
 screen_height = 600
 screen = pygame.display.set_mode((screen_width, screen_height))
+x_position =0
 pygame.display.set_caption("Boneco Anatômico 3D Simulado")
 
 # Cores
 YELLOW = (255, 255, 0)
 
 # Carregar a imagem do boneco anatômico
+image = pygame.image.load("back.png").convert_alpha()
 boneco_image = pygame.image.load("bit.png").convert_alpha()  # Substitua pelo caminho da sua imagem
 boneco_original_width = boneco_image.get_width()
 boneco_original_height = boneco_image.get_height()
@@ -50,7 +53,7 @@ while running:
     scaled_height = int(boneco_original_height * scale)
     center_x = screen_width // 2 + int(x * scale * 20)
     center_y = screen_height // 2 + int(z * scale * 10)
-
+    x_position=screen_width // 2+(-center_x)
     # Redimensionar a imagem do boneco
     boneco_scaled = pygame.transform.scale(boneco_image, (scaled_width, scaled_height))
 
@@ -58,11 +61,16 @@ while running:
     screen.fill(YELLOW)
 
     # Desenhar o boneco
-    boneco_rect = boneco_scaled.get_rect(center=(center_x, center_y))
+    boneco_rect = boneco_scaled.get_rect(center=(screen_width//2, center_y))
+    if center_x>screen_width//2-scaled_width:
+        
+        boneco_scaled.get_rect(center=(screen_width//2, center_y))
+    screen.blit(image,(x_position,0))
     screen.blit(boneco_scaled, boneco_rect)
 
     # Atualizar a tela
     pygame.display.flip()
+    
 
     # Controlar a taxa de quadros
     clock.tick(60)
